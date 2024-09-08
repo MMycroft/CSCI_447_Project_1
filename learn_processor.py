@@ -1,5 +1,7 @@
 import sys, os, numpy as np
 from processors import cancer, glass, votes, iris, soybean
+from utils import naive_bayes as nb
+
 
 def main():
     if len(sys.argv) < 2:
@@ -33,7 +35,7 @@ def main():
 
     examples = np.loadtxt(in_file, delimiter=",")
 
-    naive_bayes_classifier(examples)
+    nb.naive_bayes_classifier(examples)
 
 
 
