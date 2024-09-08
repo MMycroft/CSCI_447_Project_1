@@ -16,6 +16,8 @@ def process_data(lines):
     examples = pf.lines_to_array(better_lines, class_name_id, True) # Ensure class uses a digit id, get a matrix of floats
     # NO NEED TO BIN OR DOCUMENT since entries are already discrete
     np.random.shuffle(examples) # ensure data is in random order to eliminate bias
-    processed_lines = pf.array_to_lines(examples)   # get list of strings in proper format
+    noisy_examples = pf.add_noise(examples, 0.10)   # add noise to class, get a matrix of floats
+    clean_lines = pf.array_to_lines(examples)    # get list of strings in proper format
+    noisy_lines = pf.array_to_lines(noisy_examples) # get list of strings in proper format
 
-    return processed_lines
+    return clean_lines, noisy_lines

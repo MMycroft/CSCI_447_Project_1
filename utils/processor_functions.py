@@ -1,4 +1,6 @@
-import random, numpy as np
+import numpy as np
+from math import ceil
+from random import randint, sample
 
 def strings_to_digits(lines, strings_digits):
     """
@@ -52,7 +54,7 @@ def fix_missing_value(lines, min_val=1, max_val=10):
         line = lines[i].split(',')
         for j in range(len(line)):
             if line[j] == '?':
-                line[j] = str(random.randint(min_val, max_val))
+                line[j] = str(randint(min_val, max_val))
         lines[i] = ','.join(line)
     return lines
 
@@ -111,9 +113,8 @@ def get_attribute_bins(examples, num_bins=15):
     Returns:
         list of dict: A list where each dictionary contains bin intervals as keys and bin numbers as values.
     """
-    # examples  -  row: example value, column: attribute number
-    attributes = examples.T     # Transposes matrix
-    # attributes - row: attribute number, column: example value
+    # examples row: example value, column: attribute number
+    attributes = examples.T  # attributes row: attribute number, column: example value
 
     attribute_bins = [] # list of dictionaries that map bin intervals to bin numbers
 
@@ -125,7 +126,7 @@ def get_attribute_bins(examples, num_bins=15):
     values_per_bin = num_values // num_bins
     values_left_over = num_values % num_bins
 
-    for i in range(len(attributes) - 1):
+    for i in range(len(attributes) - 1):    # ignores class attribute
         attribute = np.sort(attributes[i])
 
         bin_edges = [attribute[0]]
@@ -173,9 +174,10 @@ def bin_attributes(examples, attribute_bins):
     Returns:
         numpy.ndarray: 2D array with discretized attribute values.
     """
-    attributes = examples.T
+    # examples row: example value, column: attribute number
+    attributes = examples.T  # attributes row: attribute number, column: example value
 
-    for i in range(len(attributes) - 1):
+    for i in range(len(attributes) - 1):    # ignore class attribute
         attribute = attributes[i]
         attribute_bin = attribute_bins[i]
 
@@ -184,5 +186,26 @@ def bin_attributes(examples, attribute_bins):
                 if min_val < attribute[j] <= max_val:
                     attributes[i][j] = int(attribute_bin[(min_val, max_val)])
                     break
+
+    return attributes.T
+
+def add_noise(examples, noise_level=0.10):
+    """
+    Adds noise to a subset of attributes in the dataset by shuffling values within an attribute.
+
+    Parameters:
+        examples (numpy.ndarray): 2D array where each row represents an example and each column represents an attribute.
+        noise_level (float): Fraction of attributes to add noise to. Default is 0.10 (10%).
+
+    Returns:
+        numpy.ndarray: 2D array with noise added to a fraction of the attributes.
+    """
+    noise_level = noise_level if (0 < noise_level < 1) else 0.10 # Ensure noise_level is between 0 and 1
+    attributes = examples.T  # attributes - row: attribute number, column: example value
+    num_attributes = len(attributes)-1   # ignore class attribute
+    num_noisy = min(ceil(num_attributes * noise_level), num_attributes)    # number of attributes to add noise to
+
+    for i in sample(range(num_attributes), num_noisy):
+        np.random.shuffle(attributes[i])
 
     return attributes.T

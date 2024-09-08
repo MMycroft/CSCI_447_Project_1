@@ -23,7 +23,9 @@ def process_data(lines):
     bins = pf.get_attribute_bins(examples, 15)    # get list of attribute bin edges
     binned_examples = pf.bin_attributes(examples, bins) # bin the example values
     np.random.shuffle(binned_examples)  # ensure data is in random order to eliminate bias
-    processed_lines = pf.array_to_lines(binned_examples)  # get list of strings in proper format
-    documentation = pf.get_bin_string(bins)  # get string for documenting binning information
+    noisy_examples = pf.add_noise(binned_examples, 0.10)   # add noise to class, get a matrix of floats
+    clean_lines = pf.array_to_lines(binned_examples)    # get list of strings in proper format
+    noisy_lines = pf.array_to_lines(noisy_examples) # get list of strings in proper format
+    documentation = pf.get_bin_string(bins) # get string for documenting binning information
 
-    return processed_lines, documentation
+    return clean_lines, noisy_lines, documentation

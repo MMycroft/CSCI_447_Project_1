@@ -3,14 +3,17 @@ from processors import iris, glass, cancer, votes, soybean
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python processor_functions.py <input_file> <output_file> <doc_file>")
+        print("Usage: python processor_functions.py <input_file_name> <output_file_name> <doc_file_name>")
         return
 
-    in_file = os.path.join("data", sys.argv[1])
-    out_file = os.path.join("clean_data", sys.argv[2])
-    doc_file = os.path.join("docs", sys.argv[3])
+    in_file_name = sys.argv[1]
+    out_file_name = sys.argv[2]
+    doc_file_name = sys.argv[3]
 
-    in_file_name = os.path.basename(in_file)
+    in_file = os.path.join("data", in_file_name)
+    clean_file = os.path.join("clean_data", out_file_name)
+    noise_file = os.path.join("noisy_data", "noisy_" + out_file_name)
+    doc_file = os.path.join("docs", doc_file_name)
 
     process = {
         "breast-cancer-wisconsin.data": cancer.process_data,
@@ -27,14 +30,18 @@ def main():
         return
 
     try:
+        # read input data file
         with open(in_file, 'r') as in_f:
             in_file_lines: list[str] = in_f.readlines()
-        # clean_lines: list[str] documentation: str
-        clean_lines, documentation = process_function(in_file_lines)
-
-        with open(out_file, 'w') as out_f:
-            out_f.writelines(clean_lines)
-        if documentation:   # write documentation if provided
+        # clean_lines: list[str] noisy_lines: list[str] documentation: str
+        clean_lines, noisy_lines, documentation = process_function(in_file_lines)
+        # write data files
+        with open(clean_file, 'w') as clean_f:
+            clean_f.writelines(clean_lines)
+        with open(noise_file, 'w') as noise_f:
+            noise_f.writelines(clean_lines)
+        # write documentation if provided
+        if documentation:
             with open(doc_file, 'w') as doc_f:
                 doc_f.write(documentation)
 
