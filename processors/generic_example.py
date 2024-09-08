@@ -18,14 +18,14 @@ def process_data(lines):
     """
     This file is a generic example and is not used. All other process_data
     functions in this package are formatted after this function according
-    to the needs of the .data file.
+    to the needs of the .raw_data file.
 
-    Process data lines by converting to digits, reordering class names,
+    Process raw_data lines by converting to digits, reordering class names,
     filling missing values, binning attributes, and shuffling examples.
-    Parameters: lines (list of str): Raw data lines from the input file.
+    Parameters: lines (list of str): Raw raw_data lines from the input file.
 
     Returns: tuple: (processed_lines, documentation) where:
-            - processed_lines is a list of strings with processed data.
+            - processed_lines is a list of strings with processed raw_data.
             - documentation is a string describing the binning information.
     """
 
@@ -35,7 +35,7 @@ def process_data(lines):
     examples = pf.lines_to_array(better_lines, class_name_id, False)    # ensure class uses a digit id, get a matrix of floats
     bins = pf.get_attribute_bins(examples, 15)  # get list of attribute bin edges
     binned_examples = pf.bin_attributes(examples, bins) # bin the examples
-    np.random.shuffle(binned_examples)  # ensure data is in random order to eliminate bias
+    np.random.shuffle(binned_examples)  # ensure raw_data is in random order to eliminate bias
     noisy_examples = pf.add_noise(binned_examples, 0.10)   # add noise to class, get a matrix of floats
     clean_lines = pf.array_to_lines(binned_examples)    # get list of strings in proper format
     noisy_lines = pf.array_to_lines(noisy_examples) # get list of strings in proper format

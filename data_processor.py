@@ -3,24 +3,24 @@ from processors import iris, glass, cancer, votes, soybean
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python processor_functions.py <input_file> <output_file> <doc_file>")
+        print("Usage: python data_processor.py <input_file> <output_file> <doc_file>")
         return
 
     in_file_name = sys.argv[1]
     out_file_name = sys.argv[2]
     doc_file_name  = sys.argv[3]
 
-    in_file = os.path.join("data", in_file_name)
+    in_file = os.path.join("raw_data", in_file_name)
     clean_file = os.path.join("clean_data", out_file_name)
     noisy_file = os.path.join("noisy_data", "noisy_" + out_file_name)
     doc_file = os.path.join("docs", doc_file_name)
 
     process = {
-        "breast-cancer-wisconsin.data": cancer.process_data,
-        "glass.data": glass.process_data,
-        "house-votes-84": votes.process_data,
-        "iris.data": iris.process_data,
-        "soybean-small": soybean.process_data
+        "breast-cancer-wisconsin.raw_data": cancer.process_data,
+        "glass.raw_data": glass.process_data,
+        "house-votes-84.raw_data": votes.process_data,
+        "iris.raw_data": iris.process_data,
+        "soybean-small.raw_data": soybean.process_data
     }
 
     process_function = process.get(in_file_name)

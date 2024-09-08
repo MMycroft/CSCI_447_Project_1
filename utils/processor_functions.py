@@ -103,7 +103,7 @@ def array_to_lines(array):
 
 def get_attribute_bins(examples, num_bins=15):
     """
-    Separates data into a specified number of bins for each attribute.
+    Separates raw_data into a specified number of bins for each attribute.
     Returns a list of dictionaries, where each dictionary maps an interval to an integer.
     
     Parameters:
