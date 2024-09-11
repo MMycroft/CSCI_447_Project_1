@@ -1,13 +1,21 @@
 import numpy as np
+
+from classes.learnablenb import LearnableNB
 from utils import processor_functions as pf
 
-class_name_id = {
-    'Iris-setosa': 1,
-    'Iris-versicolor': 2,
-    'Iris-virginica': 3
-}
+class Iris(LearnableNB):
 
-def process_data(lines):
+    class_names: list[str] = ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica']
+
+    num_classes: int = len(class_names) # number of classes
+    num_features: int = 4 # number of features (excluding the class feature)
+    num_bins: int = 15 # arbitrary number of bins used for discretizing continuous values
+
+    class_prior: np.array = np.zeros(num_classes)
+    prob_tensor: np.array = np.ones((num_classes, num_features, num_bins)) # initiated with ones to avoid anihilation by 0
+
+@staticmethod
+def process_data(lines: list[str]):
     """
     Process raw_data lines by binning attributes and shuffling examples.
     Parameters: lines (list of str): Raw raw_data lines from the input file.
@@ -15,8 +23,8 @@ def process_data(lines):
             - processed_lines is a list of strings with processed raw_data.
             - documentation is a string describing the binning information.
     """
-    examples = pf.lines_to_array(lines, class_name_id)  # ensure class uses a digit id, get a matrix of floats
-    bins = pf.get_attribute_bins(examples, 15)    # get list of attribute bin edges
+    examples = pf.lines_to_numeric_array(lines, Iris.class_names)  # ensure class uses a digit id, get a matrix of floats
+    bins = pf.get_attribute_bins(examples, Iris.num_bins)    # get list of attribute bin edges
     binned_examples = pf.bin_attributes(examples, bins) # bin the examples
     np.random.shuffle(binned_examples)  # ensure raw_data is in random order to eliminate bias
     noisy_examples = pf.add_noise(binned_examples, 0.10)   # add noise to class, get a matrix of floats

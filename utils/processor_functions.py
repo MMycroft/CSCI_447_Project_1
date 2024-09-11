@@ -2,7 +2,7 @@ import numpy as np
 from math import ceil
 from random import randint, sample
 
-def strings_to_digits(lines, strings_digits):
+def strings_to_digits(lines: list[str], strings_digits: list):
     """
     Converts string entries in each line to their corresponding digit values based on a mapping.
 
@@ -16,12 +16,12 @@ def strings_to_digits(lines, strings_digits):
     for i in range(len(lines)):
         line = lines[i].split(',')
         for j in range(len(line) - 1):  #ignore class names
-            line[j] = str(strings_digits.get(line[j], -1))
+            line[j] = str(strings_digits.index(line[j]))
         lines[i] = ','.join(line)
 
     return lines
 
-def front_to_back(lines):
+def front_to_back(lines: list[str]):
     """
     Moves the class name from the front of each line to the back.
 
@@ -58,14 +58,20 @@ def fix_missing_value(lines, min_val=1, max_val=10):
         lines[i] = ','.join(line)
     return lines
 
-def lines_to_array(lines, class_id, example_id=False):
+def remove_sample_id(lines: list[str]):
+    for i in range(len(lines)):
+        line = lines[i].split(',')
+        line.pop(0)   # remove sample id from front of line
+        lines[i] = ','.join(line)
+    return lines
+
+def lines_to_numeric_array(lines, class_names: list[str]):
     """
     Converts a list of strings into a NumPy array of floats.
 
     Parameters:
         lines (list of str): The input lines, where each line is a comma-separated string.
-        class_id (dict): A dictionary mapping class names to numeric IDs.
-        example_id (bool): If True, the first element in each line is treated as an example ID and is excluded.
+        class_names (list of str): A list of class names with the indices as numeric IDs.
 
     Returns:
         np.ndarray: A 2D NumPy array where each row represents an example and each column represents an attribute.
@@ -74,11 +80,9 @@ def lines_to_array(lines, class_id, example_id=False):
 
     for line in lines:
         attributes = line.split(',')
-        attributes.pop(0) if example_id else None   # remove example id if applicable
-
-        if str.isdigit(attributes[-1]):
-            class_name = attributes[-1].strip()
-            attributes[-1] = str(class_id.get(class_name, -1))
+        class_name = attributes[-1].strip()
+        if not str.isdigit(class_name):
+            attributes[-1] = str(class_names.index(class_name)) if class_name in class_names else -1
         result.append([float(val) for val in attributes])
 
     return np.array(result)

@@ -20,7 +20,7 @@ def main():
     out_file = os.path.join("learned_data", out_file_name)
 
     class_names = {
-        "cancer": cancer.class_name_id,
+        "cancer": cancer.Cancer.class_names,
         "glass": glass.class_name_id,
         "votes": votes.class_name_id,
         "iris": iris.class_name_id,
