@@ -1,5 +1,5 @@
 import sys, os, numpy as np
-from processors import cancer, glass, votes, iris, soybean
+from classes import cancer, glass, votes, iris, soybean
 from utils import naive_bayes as nb
 
 

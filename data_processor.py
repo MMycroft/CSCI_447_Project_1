@@ -1,5 +1,5 @@
 import sys, os
-from processors import iris, glass, cancer, votes, soybean
+from classes import iris, glass, cancer, votes, soybean
 
 def main():
     if len(sys.argv) < 3:
