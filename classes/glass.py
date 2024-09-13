@@ -33,7 +33,13 @@ class Glass(LearnableNB):
             - processed_lines is a list of strings with processed raw_data.
             - documentation is a string describing the binning information.
     """
-    examples = pf.lines_to_numeric_array(lines, Glass.class_names)  # get a matrix of floats
+    processed_lines = []
+    for i in range(len(lines)):
+      line = lines[i].strip().split(',')
+      line.pop(0)  # remove sample id from front of line
+      line[-1] = int(line[-1]) - 1
+      processed_lines.append(line)
+    examples = np.array(processed_lines, dtype=float)  # ensure class uses a digit id, get a matrix of floats
     bins = pf.get_attribute_bins(examples, Glass.num_bins)  # get list of attribute bin edges
     binned_examples = pf.bin_attributes(examples, bins)  # bin the example values
     np.random.shuffle(binned_examples)  # ensure raw_data is in random order to eliminate bias

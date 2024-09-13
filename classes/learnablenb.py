@@ -4,8 +4,6 @@ from abc import ABC, abstractmethod
 class LearnableNB(ABC):
 
   class_names: list[str] = []
-  entries_digits: list[str] = []
-
   num_classes: int = len(class_names)                             # number of classes
   num_attributes: int = 0                                         # number of attributes (excluding the class attribute)
   domain_values: tuple[int, int] = (0,0)                          # range of possible discrete values
@@ -118,8 +116,9 @@ class LearnableNB(ABC):
         counts[c]['TP'] += int(e.class_id == c and e.attributes[-1] == e.class_id)
         counts[c]['FP'] += int(e.class_id == c and e.attributes[-1] != e.class_id)
         counts[c]['FN'] += int(e.attributes[-1] == c and e.attributes[-1] != e.class_id)
-      scores[c]['precision'] = counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FP'])
-      scores[c]['recall'] = counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FN'])
+
+      scores[c]['precision'] = 0 if not (counts[c]['TP'] + counts[c]['FP']) else counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FP'])
+      scores[c]['recall'] = 0 if not (counts[c]['TP'] + counts[c]['FN']) else counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FN'])
       scores[c]['f1_score'] = (2 * scores[c]['precision'] * scores[c]['recall']) / (scores[c]['precision'] + scores[c]['recall'])
       score += scores[c]['f1_score']
 

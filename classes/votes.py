@@ -29,9 +29,7 @@ class Votes(LearnableNB):
     for i in range(len(lines)):
       line = lines[i].strip().split(',')
       line.append(line.pop(0))  # moves the class name from front to back
-      class_names = Votes.class_names
-      line[-1] = class_names.index(line[-1]) # sets class name to digit
-      print("#################", len(line))
+      line[-1] = Votes.class_names.index(line[-1]) # sets class name to digit
       for j in range(len(line)-1):
         line[j] = strings_digits.index(line[j]) # ensure all entries except class name/id are digits
       processed_lines.append(line)

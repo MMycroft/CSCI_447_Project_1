@@ -68,8 +68,8 @@ def main():
     print(f"An unexpected error occurred: {e}")
 
   for i in range(len(clean_lines)):
-    clean_lines[i] = clean_lines[i].split(',')
-    noisy_lines[i] = noisy_lines[i].split(',')
+    clean_lines[i] = clean_lines[i].strip().split(',')
+    noisy_lines[i] = noisy_lines[i].strip().split(',')
   clean_data = np.array(clean_lines, dtype=int)
   noisy_data = np.array(noisy_lines, dtype=int)
 
@@ -84,8 +84,8 @@ def main():
       test_experiments: list['LearnableNB'] = [learnable_class(data, False) for data in test_data]
       train_experiments: list['LearnableNB'] = [learnable_class(data, True) for data in train_data]
 
-      print(f"Number of test experiments: {len(test_experiments)}")
-      print(f"Number of train experiments: {len(train_experiments)}")
+      print(f"Number of training experiments: {len(train_experiments)}")
+      print(f"Number of testing experiments: {len(test_experiments)}")
 
       learnable_class.naive_bayes_trainer(train_experiments)
       learnable_class.naive_bayes_classifier(test_experiments)

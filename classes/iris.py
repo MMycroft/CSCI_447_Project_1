@@ -16,21 +16,28 @@ class Iris(LearnableNB):
   def __init__(self, attributes: np.array(int), classify: bool = False):
     super().__init__(attributes, classify)
 
-def process_data(lines: list[str]):
-  """
-  Process raw_data lines by binning attributes and shuffling examples.
-  Parameters: lines (list of str): Raw raw_data lines from the input file.
-  Returns: tuple: (processed_lines, documentation) where:
-          - processed_lines is a list of strings with processed raw_data.
-          - documentation is a string describing the binning information.
-  """
-  examples = pf.lines_to_numeric_array(lines, Iris.class_names)  # ensure class uses a digit id, get a matrix of floats
-  bins = pf.get_attribute_bins(examples, Iris.num_bins)  # get list of attribute bin edges
-  binned_examples = pf.bin_attributes(examples, bins)  # bin the examples
-  np.random.shuffle(binned_examples)  # ensure raw_data is in random order to eliminate bias
-  noisy_examples = pf.add_noise(binned_examples, 0.10)  # add noise to class, get a matrix of floats
-  clean_lines = pf.array_to_lines(binned_examples)    # get list of strings in proper format
-  noisy_lines = pf.array_to_lines(noisy_examples) # get list of strings in proper format
-  documentation = pf.get_bin_string(bins) # get string for documenting binning information
+  @staticmethod
+  def process_data(lines: list[str]):
+    """
+    Process raw_data lines by binning attributes and shuffling examples.
+    Parameters: lines (list of str): Raw raw_data lines from the input file.
+    Returns: tuple: (processed_lines, documentation) where:
+            - processed_lines is a list of strings with processed raw_data.
+            - documentation is a string describing the binning information.
+    """
+    processed_lines = []
+    for i in range(len(lines)):
+      line = lines[i].strip().split(',')
+      line[-1] = Iris.class_names.index(line[-1])
+      processed_lines.append(line)
+    examples = np.array(processed_lines, dtype=float)
+    #examples = pf.lines_to_numeric_array(lines, Iris.class_names)  # ensure class uses a digit id, get a matrix of floats
+    bins = pf.get_attribute_bins(examples, Iris.num_bins)  # get list of attribute bin edges
+    binned_examples = pf.bin_attributes(examples, bins)  # bin the examples
+    np.random.shuffle(binned_examples)  # ensure raw_data is in random order to eliminate bias
+    noisy_examples = pf.add_noise(binned_examples, 0.10)  # add noise to class, get a matrix of floats
+    clean_lines = pf.array_to_lines(binned_examples)    # get list of strings in proper format
+    noisy_lines = pf.array_to_lines(noisy_examples) # get list of strings in proper format
+    documentation = pf.get_bin_string(bins) # get string for documenting binning information
 
-  return clean_lines, noisy_lines, documentation
+    return clean_lines, noisy_lines, documentation

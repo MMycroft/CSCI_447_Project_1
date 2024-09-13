@@ -24,7 +24,12 @@ class Soybean(LearnableNB):
     Parameters: lines (list of str): Raw raw_data lines from the input file.
     Returns: processed_lines (list of str): a list of strings with processed raw_data.
     """
-    examples = pf.lines_to_numeric_array(lines, Soybean.class_names)  # ensure class uses a digit id, get a matrix of floats
+    processed_lines = []
+    for i in range(len(lines)):
+      line = lines[i].strip().split(',')
+      line[-1] = Soybean.class_names.index(line[-1])
+      processed_lines.append(line)
+    examples = np.array(processed_lines, dtype=int)  # ensure class uses a digit id, get a matrix of floats
     # NO NEED TO BIN OR DOCUMENT since entries are already discrete
     np.random.shuffle(examples)  # ensure raw_data is in random order to eliminate bias
     noisy_examples = pf.add_noise(examples, 0.10)  # add noise to class, get a matrix of floats

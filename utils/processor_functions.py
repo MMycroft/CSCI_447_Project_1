@@ -112,6 +112,7 @@ def array_to_lines(array):
   Returns:
       list of str: A list of strings, where each string represents a row of the array in CSV format.
   """
+  #print(array)
   lines = []
 
   for row in array:
@@ -158,10 +159,9 @@ def get_attribute_bins(experiments, num_bins=15):
 
       min_val = bin_edges[j]
       max_val = bin_edges[j + 1]
-      attribute_bin[(min_val, max_val)] = j + 1
-
+      attribute_bin[(min_val, max_val)] = j
     attribute_bins.append(attribute_bin)
-
+  print(attribute_bins)
   return attribute_bins
 
 def get_bin_string(attribute_bins):
@@ -203,7 +203,7 @@ def bin_attributes(experiments, attribute_bins):
     for j in range(len(attribute)):
       for (min_val, max_val) in attribute_bin:
         if min_val < attribute[j] <= max_val:
-          attributes[i][j] = int(attribute_bin[(min_val, max_val)])
+          attributes[i][j] = attribute_bin[(min_val, max_val)]
           break
 
   return attributes.T
