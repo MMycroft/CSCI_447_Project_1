@@ -99,8 +99,11 @@ class LearnableNB(ABC):
 
   @staticmethod
   def zero_one_loss(classified_examples: list['LearnableNB']):
+    total = len(classified_examples)
     correct = sum([e.attributes[-1] == e.class_id for e in classified_examples])
-    return 1 - correct / len(classified_examples)
+    loss = 1 - correct / total
+
+    return loss
 
   @staticmethod
   def f1_score_loss(classified_examples: list['LearnableNB']):
@@ -119,6 +122,7 @@ class LearnableNB(ABC):
       scores[c]['recall'] = counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FN'])
       scores[c]['f1_score'] = (2 * scores[c]['precision'] * scores[c]['recall']) / (scores[c]['precision'] + scores[c]['recall'])
       score += scores[c]['f1_score']
+
     return 1 - score / num_classes
 #########################################################################
 

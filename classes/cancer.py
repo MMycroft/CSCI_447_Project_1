@@ -20,7 +20,7 @@ class Cancer(LearnableNB):
     super().__init__(attributes, classify)
 
   @staticmethod
-  def process_data(lines):
+  def process_data(lines: list[str]):
     """
     Process raw_data lines by filling missing values and shuffling examples.
     Parameters: lines (list of str): Raw raw_data lines from the input file.

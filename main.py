@@ -49,6 +49,7 @@ def main():
       in_file_lines: list[str] = in_f.readlines()
     # clean_lines: list[str] noisy_lines: list[str] documentation: str
       clean_lines, noisy_lines, documentation = learnable_class.process_data(in_file_lines)
+
     # write output files
     with open(clean_file, 'w') as clean_f:
       clean_f.writelines(clean_lines)
