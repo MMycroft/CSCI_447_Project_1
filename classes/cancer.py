@@ -39,9 +39,8 @@ class Cancer(LearnableNB):
           line[j] = int(line[j]) - 1
       processed_lines.append(line)
     examples = np.array(processed_lines, dtype=int)
-    print(examples)
     # NO NEED TO BIN OR DOCUMENT since entries are already discrete
-    #np.random.shuffle(examples) # ensure raw_data is in random order to eliminate bias
+    np.random.shuffle(examples) # ensure raw_data is in random order to eliminate bias
     noisy_examples = pf.add_noise(examples, 0.10)  # add noise to class, get a matrix of floats
 
     clean_lines = pf.array_to_lines(examples)    # get list of strings in proper format

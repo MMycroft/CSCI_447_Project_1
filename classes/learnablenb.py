@@ -80,6 +80,7 @@ class LearnableNB(ABC):
 
   @classmethod
   def naive_bayes_classifier(cls, test_examples: list['LearnableNB']):
+    print("TEST", test_examples)
     classified_examples = []
     probabilities = []
     for e in test_examples:
@@ -89,7 +90,8 @@ class LearnableNB(ABC):
         for j in range(cls.num_attributes):
           attribute = j
           value = e.attributes[j]
-          p *= cls.prob_tensor[i][attribute][value]
+          value_prob = cls.prob_tensor[i][attribute][value]
+          p *= value_prob
         class_prob.append(p)
       probabilities.append(class_prob)
       class_id = class_prob.index(max(class_prob))
@@ -104,21 +106,25 @@ class LearnableNB(ABC):
     results = []
     for e in classified_examples:
       results.append(e.attributes[-1] == e.class_id)
-      print(str(e.attributes[-1]) + " = " + str(e.class_id))
     return sum(results) / len(results)
 
   @staticmethod
   def f1_score_loss(classified_examples: list['LearnableNB']):
-    x = {'TP': 0, 'FP': 0, 'FN': 0}
+    score = 0
+    counts = {}
+    scores = {}
     for c in range(LearnableNB.num_classes):
+      counts[c] = {'TP': 0, 'FP': 0, 'FN': 0}
+      scores[c] = {'precision': 0.0, 'recall': 0.0, 'f1_score': 0.0}
       for e in classified_examples:
-        x['TP'] += int(e.class_id == c and e.attributes[-1] == e.class_id)
-        x['FP'] += int(e.class_id == c and e.attributes[-1] != e.class_id)
-        x['FN'] += int(e.attributes[-1] == c and e.attributes[-1] != e.class_id)
-    precision = x['TP'] / (x['TP'] + x['FP'])
-    recall = x['TP'] / (x['TP'] + x['FN'])
-    f1_score = (2 * precision * recall) / (precision + recall)
-    return f1_score
+        counts[c]['TP'] += int(e.class_id == c and e.attributes[-1] == e.class_id)
+        counts[c]['FP'] += int(e.class_id == c and e.attributes[-1] != e.class_id)
+        counts[c]['FN'] += int(e.attributes[-1] == c and e.attributes[-1] != e.class_id)
+      scores[c]['precision'] = counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FP'])
+      scores[c]['recall'] = counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FN'])
+      scores[c]['f1_score'] = (2 * scores[c]['precision'] * scores[c]['recall']) / (scores[c]['precision'] + scores[c]['recall'])
+    score += scores[c]['f1_score']
+    return score / LearnableNB.num_classes
 
 #########################################################################
 

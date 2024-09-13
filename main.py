@@ -82,10 +82,13 @@ def main():
       test_data: np.array(int) = np.array(folds[i], dtype=int)
       train_data: np.array(int) = np.array(np.concatenate(folds[0:i] + folds[i + 1:]), dtype=int)
       test_experiments: list['LearnableNB'] = []
+      train_experiments: list['LearnableNB'] = []
       for data in test_data:
-        learnable_class(data, False)
-
-      train_experiments: list['LearnableNB'] = [learnable_class(data, True) for data in train_data]
+        test_experiments.append(learnable_class(data, False))
+      print(len(test_experiments))
+      for data in train_data:
+        train_experiments.append(learnable_class(data, True))
+      print(len(train_experiments))
 
       learnable_class.naive_bayes_trainer(train_experiments)
       learnable_class.naive_bayes_classifier(test_experiments)
