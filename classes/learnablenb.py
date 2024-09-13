@@ -33,19 +33,19 @@ class LearnableNB(ABC):
     self.class_name = self.class_names[self.class_id]
 
   # instancemethod
-  def set_class_id(self, new_id):
-    if 0 <= new_id <= LearnableNB.num_classes * 2:
+  def set_class(self, new_id):
+    if 0 <= new_id < self.num_classes:
       self.class_id = new_id
-      self.class_name = LearnableNB.class_names[self.class_id]
+      self.class_name = self.class_names[self.class_id]
     else:
       self.class_id = None
       self.class_name = None
 
   # instancemethod
   def set_class_name(self, new_name):
-    if new_name in LearnableNB.class_names:
+    if new_name in self.class_names:
       self.class_name = new_name
-      self.class_id = LearnableNB.class_names.index(new_name)
+      self.class_id = self.class_names.index(new_name)
     else:
       self.class_name = None
       self.class_id = None
@@ -61,41 +61,37 @@ class LearnableNB(ABC):
     #   The attribute probabilities are stored in a 3D array (tensor!!)
 
     #3. For each attribute in the class-specific training set,
-    #   calculate the attribute-value prior probability F(Aj = a_k, C = c_i)
+    #   calculate the attribute likelihoods F(Aj = a_k, C = c_i)
     for e in training_examples:
-      for j in range(cls.num_attributes):
-        attribute = j
-        value = e.attributes[j]
-        cls.prob_tensor[int(e.class_id)][int(attribute)][int(value)] += 1    # counts occurrences of value in given attribute and class
+      for attr_id in range(cls.num_attributes):
+        value = e.attributes[attr_id]
+        cls.prob_tensor[int(e.class_id)][int(attr_id)][int(value)] += 1    # counts occurrences of value in given attribute and class
 
-    for i in range(cls.num_classes):
-      for j in range(cls.num_attributes):
-        value_counts = cls.prob_tensor[i][j]    # index of the array is the attribute value, count of the value is contained in the array
+    for c_id in range(cls.num_classes):
+      for attr_id in range(cls.num_attributes):
+        value_counts = cls.prob_tensor[c_id][attr_id]    # index of the array is the attribute value, count of the value is contained in the array
         total_count = np.sum(value_counts)
         if total_count> 0:  # check that nothing went wrong
           n_ci = total_count
           d = LearnableNB.num_values
           # plus 1 in the numerator is handled with the initialization of prob_tensor to all 1's
-          cls.prob_tensor[i][j] /= (n_ci + d)    # changes counts to probabilities
+          cls.prob_tensor[c_id][attr_id] /= (n_ci + d)    # changes counts to probabilities
 
   @classmethod
   def naive_bayes_classifier(cls, test_examples: list['LearnableNB']):
-    print("TEST", test_examples)
     classified_examples = []
-    probabilities = []
+    C = [0] * cls.num_classes
     for e in test_examples:
-      class_prob = []
-      for i in range(cls.num_classes):
-        p = cls.class_prior[i]
-        for j in range(cls.num_attributes):
-          attribute = j
-          value = e.attributes[j]
-          value_prob = cls.prob_tensor[i][attribute][value]
-          p *= value_prob
-        class_prob.append(p)
-      probabilities.append(class_prob)
-      class_id = class_prob.index(max(class_prob))
-      e.set_class_id(class_id)    # sets class id and class name
+      for c_id in range(cls.num_classes):
+        Q = cls.class_prior[c_id]
+        F = []
+        for attr_id in range(cls.num_attributes):
+          val = e.attributes[attr_id]
+          f = cls.prob_tensor[c_id][attr_id][val]
+          F.append(f)
+        C[c_id] = Q * np.prod(F)
+      class_id = C.index(max(C))
+      e.set_class(class_id)
       classified_examples.append(e)
     return classified_examples
 
@@ -103,17 +99,16 @@ class LearnableNB(ABC):
 
   @staticmethod
   def zero_one_loss(classified_examples: list['LearnableNB']):
-    results = []
-    for e in classified_examples:
-      results.append(e.attributes[-1] == e.class_id)
-    return sum(results) / len(results)
+    correct = sum([e.attributes[-1] == e.class_id for e in classified_examples])
+    return 1 - correct / len(classified_examples)
 
   @staticmethod
   def f1_score_loss(classified_examples: list['LearnableNB']):
+    num_classes = classified_examples[0].num_classes
     score = 0
     counts = {}
     scores = {}
-    for c in range(LearnableNB.num_classes):
+    for c in range(num_classes):
       counts[c] = {'TP': 0, 'FP': 0, 'FN': 0}
       scores[c] = {'precision': 0.0, 'recall': 0.0, 'f1_score': 0.0}
       for e in classified_examples:
@@ -123,8 +118,7 @@ class LearnableNB(ABC):
       scores[c]['precision'] = counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FP'])
       scores[c]['recall'] = counts[c]['TP'] / (counts[c]['TP'] + counts[c]['FN'])
       scores[c]['f1_score'] = (2 * scores[c]['precision'] * scores[c]['recall']) / (scores[c]['precision'] + scores[c]['recall'])
-    score += scores[c]['f1_score']
-    return score / LearnableNB.num_classes
-
+      score += scores[c]['f1_score']
+    return 1 - score / num_classes
 #########################################################################
 

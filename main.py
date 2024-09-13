@@ -71,32 +71,32 @@ def main():
     noisy_lines[i] = noisy_lines[i].split(',')
   clean_data = np.array(clean_lines, dtype=int)
   noisy_data = np.array(noisy_lines, dtype=int)
-  print(clean_data)
-  print(noisy_data)
 
   def n_fold_cross_validation(data: np.array(int)):
-    folds: list[np.array(int)] = np.array_split(data, 10)
+    folds = np.array_split(data, 10)
 
     losses = []
+    print("--------------------------------")
     for i in range(len(folds)):
-      test_data: np.array(int) = np.array(folds[i], dtype=int)
+      test_data: np.array(int) = folds[i]
       train_data: np.array(int) = np.array(np.concatenate(folds[0:i] + folds[i + 1:]), dtype=int)
-      test_experiments: list['LearnableNB'] = []
-      train_experiments: list['LearnableNB'] = []
-      for data in test_data:
-        test_experiments.append(learnable_class(data, False))
-      print(len(test_experiments))
-      for data in train_data:
-        train_experiments.append(learnable_class(data, True))
-      print(len(train_experiments))
+      test_experiments: list['LearnableNB'] = [learnable_class(data, False) for data in test_data]
+      train_experiments: list['LearnableNB'] = [learnable_class(data, True) for data in train_data]
+
+      print(f"Number of test experiments: {len(test_experiments)}")
+      print(f"Number of train experiments: {len(train_experiments)}")
 
       learnable_class.naive_bayes_trainer(train_experiments)
       learnable_class.naive_bayes_classifier(test_experiments)
-      print(test_experiments)
+      zero_one_loss = learnable_class.zero_one_loss(test_experiments)
+      f1_score_loss = learnable_class.f1_score_loss(test_experiments)
 
-      losses.append([learnable_class.zero_one_loss(test_experiments), learnable_class.f1_score_loss(test_experiments)])
+      print(f"0/1 loss: {zero_one_loss}")
+      print(f"f1 score: {f1_score_loss}")
+      print( "--------------------------------")
+      losses.append([zero_one_loss, f1_score_loss])
 
-    loss_string = ''
+    loss_string = "     0/1 loss     |     f1 score\n"
     for i in range(len(losses)):
       loss_string += f"{losses[i][0]},{losses[i][1]}\n"
 
