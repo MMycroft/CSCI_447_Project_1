@@ -32,7 +32,7 @@ class Votes(LearnableNB):
       class_names = Votes.class_names
       line[-1] = class_names.index(line[-1]) # sets class name to digit
       print("#################", len(line))
-      for j in range(len(line)):
+      for j in range(len(line)-1):
         line[j] = strings_digits.index(line[j]) # ensure all entries except class name/id are digits
       processed_lines.append(line)
     examples = np.array(processed_lines, dtype=int)  # ensure class uses a digit id, get a matrix of floats
