@@ -1,7 +1,4 @@
-from abc import abstractmethod
-
 import numpy as np
-
 from classes.learnablenb import LearnableNB
 from utils import processor_functions as pf
 
@@ -18,7 +15,11 @@ class Votes(LearnableNB):
   class_prior: np.array = np.zeros(num_classes)
   prob_tensor: np.array = np.ones((num_classes, num_attributes, num_values)) #initialized to all 1's for smoothing
 
-  def process_data(self, lines: list[str]):
+  def __init__(self, attributes: np.array(int), classify: bool = False):
+    super().__init__(attributes, classify)
+
+  @staticmethod
+  def process_data(lines: list[str]):
     """
     Process raw_data lines by converting to digits, reordering class names, and shuffling examples.
     Parameters: lines (list of str): Raw raw_data lines from the input file.

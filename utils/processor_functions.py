@@ -65,6 +65,21 @@ def remove_sample_id(lines: list[str]):
     lines[i] = ','.join(line)
   return lines
 
+def fix_class_id(lines, div=1):
+  for i in range(len(lines)):
+    line = lines[i].split(',')
+    line[-1] = int(line[-1])//div - 1 # ensure class id is incremented by one class is is zero indexed
+    lines[i] = ','.join(line)
+  return lines
+
+def fix_feature_values(lines: list[str]):
+  for i in range(len(lines)):
+    line = lines[i].split(',')
+    for j in range(len(line)):
+      lines[i][j] -= 1   #set values to be zero indexed
+      lines[i] = ','.join(line)
+  return lines
+
 def lines_to_numeric_array(lines, class_names: list[str]):
   """
   Converts a list of strings into a NumPy array of floats.
