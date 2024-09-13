@@ -1,45 +1,70 @@
 import sys, os, numpy as np
+from classes.learnablenb import LearnableNB
 from classes import cancer, glass, votes, iris, soybean
-from utils import naive_bayes as nb
-
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python learn_processor.py <input_file> <output_file>")
-        return
+  if len(sys.argv) < 3:
+    print("Usage: python learn_processor.py <input_file> <output_file>")
+    return
 
-    in_file_name = sys.argv[0]
-    out_file_name = sys.argv[1]
+  in_file_name = sys.argv[1]
+  out_file_name = sys.argv[2]
 
-    prefix = in_file_name.split('_')[0]
-    suffix = in_file_name.split('_')[1]
+  prefix = in_file_name.split('_')[0]
+  suffix = in_file_name.split('_')[1]
 
-    in_file_folder = prefix + '_data'
+  in_file_folder = prefix + '_data'
 
-    in_file = os.path.join(in_file_folder, in_file_name)
-    out_file = os.path.join("learned_data", out_file_name)
+  in_file = os.path.join(in_file_folder, in_file_name)
+  out_file = os.path.join("loss", out_file_name)
 
-    class_names = {
-        "cancer": cancer.Cancer.class_names,
-        "glass": glass.class_name_id,
-        "votes": votes.class_name_id,
-        "iris": iris.class_name_id,
-        "soybean": soybean.class_name_id,
-    }
+  learnable_classes = {
+    "cancer": cancer.Cancer,
+    "glass": glass.Glass,
+    "votes": votes.Votes,
+    "iris": iris.Iris,
+    "soybean": soybean.Soybean
+  }
 
-    class_name_id = class_names.get(suffix)
+  Learnable = learnable_classes.get(suffix)
 
-    if class_name_id is None:
-        print(f"Error: No class name for '{suffix}'.")
-        return
+  if Learnable is None:
+    print(f"Error: No class for '{suffix}'.")
+    return
 
-    examples = np.loadtxt(in_file, delimiter=",")
+  try:
+    data: np.array(int) = np.loadtxt(in_file, delimiter=",")
+  except Exception as e:
+    print(f"Error loading data from '{in_file}': {e}")
+    return
 
-    nb.naive_bayes_classifier(examples)
+  folds: list[np.array(int)] = np.array_split(data, 10)
+
+  losses = []
+  for i in range(len(folds)):
+    test_data: np.array(int) = folds[i]
+    train_data: np.array(int) = np.concatenate(folds[0:i] + folds[i+1:])
+
+    test_experiments: list['LearnableNB'] = [Learnable(data, False) for data in test_data]
+    train_experiments: list['LearnableNB'] = [Learnable(data, True) for data in train_data]
+
+    Learnable.naive_bayes_trainer(train_experiments)
+    Learnable.naive_bayes_classifier(test_experiments)
+
+    losses.append([Learnable.zero_one_loss(test_experiments), Learnable.f1_score_loss(test_experiments)])
+
+  try:
+    with open(out_file, 'w') as out_f:
+      for loss in losses:
+        out_f.write(f"{loss[0]},{loss[1]}\n")
+
+  except FileNotFoundError:
+    print(f"Error: File '{out_file}' not found.")
+  except IOError as e:
+    print(f"Error writing file '{out_file}': {e}")
+  except Exception as e:
+    print(f"An unexpected error occurred: {e}")
 
 
-
-
-
-    if __name__ == "__main__":
-        main()
+  if __name__ == "__main__":
+    main()
